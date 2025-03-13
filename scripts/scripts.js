@@ -13,7 +13,9 @@ import {
 } from './aem.js';
 
 import { decorateButtons } from '../libs/utils/decorate.js';
-import { loadPalette, createTag, isProductionEnvironment } from '../libs/utils/utils.js';
+import {
+  loadPalette, createTag, isProductionEnvironment, getEnvConfig,
+} from '../libs/utils/utils.js';
 
 export const PRODUCTION_DOMAINS = ['www.creditacceptance.com'];
 
@@ -282,11 +284,35 @@ export function buildFragmentBlocks(main) {
 }
 
 /**
+ * Sets the configuration for links that have config in their text coming from env-configs.json.
+ * The configuration values are expected to be in the format `#_config:<type>`.
+ * @param {HTMLElement} el - The element containing the links to be configured.
+ */
+export function setLinksConfig(el) {
+  const anchors = el.querySelectorAll('a');
+  if (anchors.length === 0) return;
+  anchors.forEach((anchor) => {
+    const envConfigs = anchor.textContent && [...anchor.textContent.matchAll(/#_config:([a-zA-Z-]+)/g)];
+    if (envConfigs) {
+      envConfigs.forEach((match) => {
+        anchor.textContent = anchor.textContent.replace(match[0], '');
+        (async function setEnvConfigUrl() {
+          const url = await getEnvConfig(match[1]);
+          if (!url) return;
+          anchor.href = url;
+        }());
+      });
+    }
+  });
+}
+
+/**
  * Decorates the main element.
  * @param {Element} main The main element
  */
 // eslint-disable-next-line import/prefer-default-export
 export function decorateMain(main) {
+  setLinksConfig(main);
   decorateButtons(main);
   decorateIcons(main);
   decorateSections(main);

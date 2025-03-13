@@ -1,6 +1,6 @@
 // Shared block decorate functions
 
-import { createTag, getEnvConfig } from './utils.js';
+import { createTag } from './utils.js';
 
 /**
  * Checks if a hex color value is dark or light
@@ -52,18 +52,6 @@ export function decorateButtons(el) {
       customClasses.forEach((match) => {
         button.textContent = button.textContent.replace(match[0], '');
         button.classList.add(match[1]);
-      });
-    }
-
-    const envConfigs = button.textContent && [...button.textContent.matchAll(/#_config:([a-zA-Z-]+)/g)];
-    if (envConfigs) {
-      envConfigs.forEach((match) => {
-        button.textContent = button.textContent.replace(match[0], '');
-        (async function setEnvConfigUrl() {
-          const url = await getEnvConfig(match[1]);
-          if (!url) return;
-          button.href = url;
-        }());
       });
     }
   });
