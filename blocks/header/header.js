@@ -1,6 +1,6 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
-import { createTag } from '../../libs/utils/utils.js';
+import { createTag, getEnvConfig } from '../../libs/utils/utils.js';
 
 const icons = {
   user: '/icons/user.svg',
@@ -85,7 +85,7 @@ function decorateMainMenu(section) {
 }
 
 function formatHeaderElements(fragments) {
-  fragments.forEach((section, i) => {
+  fragments.forEach(async (section, i) => {
     const innerSection = section.querySelector('.section');
     if (!innerSection) return;
     section.innerHTML = innerSection.innerHTML;
@@ -99,7 +99,8 @@ function formatHeaderElements(fragments) {
       const userIcon = createTag('img', {
         src: icons.user, alt: 'Login', width: '18px', height: '21px',
       });
-      const userBtn = createTag('a', { class: 'btn-mobile btn-user', href: 'https://customer.creditacceptance.com/login', target: '_blank' }, userIcon);
+      const loginUrl = await getEnvConfig('customer-portal-login') || 'https://customer.creditacceptance.com/login';
+      const userBtn = createTag('a', { class: 'btn-mobile btn-user', href: loginUrl, target: '_blank' }, userIcon);
       contentWrapper.prepend(userBtn);
       const hamAttr = {
         class: 'btn-mobile btn-ham',
