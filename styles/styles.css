@@ -600,6 +600,7 @@ main > .section-outer:has(.section.strong-bottom-shadow) {
   &.gap-4 { gap: 4rem; }
   &.gap-5 { gap: 5rem; }
   &.gap-6 { gap: 6rem; }
+  &.row-gap-0 { row-gap: 0;}
 }
 
 .section.grid-section > .default-content-wrapper {
