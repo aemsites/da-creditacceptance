@@ -85,7 +85,7 @@ function decorateMainMenu(section) {
 }
 
 function formatHeaderElements(fragments) {
-  fragments.forEach(async (section, i) => {
+  fragments.forEach((section, i) => {
     const innerSection = section.querySelector('.section');
     if (!innerSection) return;
     section.innerHTML = innerSection.innerHTML;
@@ -99,9 +99,13 @@ function formatHeaderElements(fragments) {
       const userIcon = createTag('img', {
         src: icons.user, alt: 'Login', width: '18px', height: '21px',
       });
-      const loginUrl = await getEnvConfig('customer-portal-login') || 'https://customer.creditacceptance.com/login';
-      const userBtn = createTag('a', { class: 'btn-mobile btn-user', href: loginUrl, target: '_blank' }, userIcon);
+      const userBtn = createTag('a', { class: 'btn-mobile btn-user', href: 'https://customer.creditacceptance.com/login', target: '_blank' }, userIcon);
       contentWrapper.prepend(userBtn);
+      (async function setEnvConfigUrl() {
+        const loginUrl = await getEnvConfig('customer-portal-login');
+        if (!loginUrl) return;
+        userBtn.href = loginUrl;
+      }());
       const hamAttr = {
         class: 'btn-mobile btn-ham',
         'aria-label': 'Toggle Main Menu',
