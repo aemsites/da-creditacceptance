@@ -129,7 +129,6 @@ main > .section-outer > .section.marquee-container {
 /* mobile-only */
 @media screen and (width < 960px) {
   .marquee h1 {
-    font-size: 46px;
     line-height: 42px;
   }
 }
