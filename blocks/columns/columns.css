@@ -350,8 +350,8 @@
   
     .columns .media { margin-bottom: 1.5rem; }
   
-    .columns.big-icons .copy:first-of-type > :is(p:not(.icon-elm), h4),
-    .columns.big-icons .copy:has(.icon-elm) + .copy > :is(p:not(.icon-elm), h4) {
+    .columns.big-icons .copy:first-of-type > :is(p:not(.icon-elm), h3, h4),
+    .columns.big-icons .copy:has(.icon-elm) + .copy > :is(p:not(.icon-elm), h3, h4) {
         margin-inline-start: 80px;
     }
 
