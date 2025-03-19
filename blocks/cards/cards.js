@@ -5,7 +5,7 @@ import { initSlider } from '../../libs/utils/decorate.js';
 const isDesktop = window.matchMedia('(min-width: 960px)');
 
 export function isDateValid(dateStr) {
-  if (!dateStr || typeof dateStr !== 'string') return false;
+  if (!dateStr || typeof dateStr !== 'string' || dateStr.length > 18) return false;
 
   // eslint-disable-next-line no-restricted-globals
   return !isNaN(new Date(dateStr));
