@@ -56,10 +56,9 @@ footer .footer p {
     flex-flow: row wrap;
     justify-content: center;
     align-items: center;
-    gap: 48px;
+    gap: 2rem;
     margin-block-start: 24px;
     padding-block: 48px;
-
 }
 
 .footer .default-content-wrapper .footer-images-container a {
@@ -127,6 +126,10 @@ footer .accordion.sitemap details summary .accordion-item-minus {
     .footer .default-content-wrapper ul li {
         width: auto;
     }
+
+    .footer .default-content-wrapper .footer-images-container {
+        gap: 3rem;
+    }
 }
 
 @media (width >=992px) {
@@ -140,5 +143,13 @@ footer .accordion.sitemap details summary .accordion-item-minus {
 
     .footer .default-content-wrapper ul li:not(:last-child) {
         border-right: 1px solid #1b1b1b;
+    }
+}
+
+/* override global styles for mobile only */
+@media (width < 768px) {
+    footer .section-outer > .section,
+    footer .footer .default-content-wrapper {
+        padding-inline: 0;
     }
 }
