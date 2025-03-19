@@ -191,7 +191,7 @@ export function checkDomain(url) {
   let result = domainCheckCache[urlToCheck.hostname];
   if (!result) {
     const isProd = PRODUCTION_DOMAINS.some((host) => urlToCheck.hostname.includes(host));
-    const isHlx = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live'].some((host) => urlToCheck.hostname.includes(host));
+    const isHlx = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live', '.workers.'].some((host) => urlToCheck.hostname.includes(host));
     const isLocal = urlToCheck.hostname.includes('localhost');
     const isPreview = isLocal || urlToCheck.hostname.includes('hlx.page') || urlToCheck.hostname.includes('aem.page');
     const isKnown = isProd || isHlx || isLocal;
