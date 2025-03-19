@@ -363,7 +363,7 @@ header .nav-brand {
           li {
             min-width: 270px;
             margin: 0;
-            padding: 0 1rem;
+            padding: 0 1.8rem;
 
             a { 
               padding: .75rem 0;
@@ -380,7 +380,7 @@ header .nav-brand {
 
     .detail-0 ul {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(max-content, 1fr));
       grid-gap: 0 1rem;
     }
     
