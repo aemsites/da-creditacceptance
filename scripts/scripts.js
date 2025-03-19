@@ -17,7 +17,7 @@ import {
   loadPalette, createTag, isProductionEnvironment, getEnvConfig,
 } from '../libs/utils/utils.js';
 
-export const PRODUCTION_DOMAINS = ['www.creditacceptance.com'];
+export const PRODUCTION_DOMAINS = ['www.creditacceptance.com', 'testeds.creditacceptance.com', 'qaeds.creditacceptance.com'];
 
 /**
  * load fonts.css and set a session storage flag
