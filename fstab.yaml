@@ -1,2 +1,4 @@
 mountpoints:
-  /: https://creditacceptance0.sharepoint.com/:f:/r/sites/AdobeExperienceManager-EdgeDeliveryServices-WWWSite/Shared%20Documents/creditacceptance
+  /:
+    url: https://content.da.live/amol-anand/da-creditacceptance/
+    type: markup
