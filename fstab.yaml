@@ -1,4 +1,4 @@
 mountpoints:
   /:
-    url: https://content.da.live/amol-anand/da-creditacceptance/
+    url: https://content.da.live/aemsites/da-creditacceptance/
     type: markup

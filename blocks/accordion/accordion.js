@@ -51,6 +51,10 @@ function rearrangeSectionContents(section) {
         nextElement = nextElement.nextElementSibling;
       }
       child.previousElementSibling?.append(...contents);
+
+      if (child.children.length === 0) {
+        child.remove();
+      }
     }
   });
 }
@@ -85,27 +89,43 @@ function buildAccordionSection(section) {
 }
 
 async function decorateFAQs(block) {
-  const fragment = block.querySelector('a');
-  if (!fragment) return;
-
-  const path = fragment.getAttribute('href');
-  // loadFragment returns an element or a null
-  const content = await loadFragment(path);
-  // this will probably throw for a null content
-  const fragmentSection = content && content.querySelector('.section');
-
-  if (!fragmentSection) return;
-
-  buildAccordionSection(fragmentSection);
-  fragmentSection.querySelectorAll('.accordion').forEach((accordion) => {
-    accordion.classList.add(...block.classList);
-    decorate(accordion);
-  });
+  const fragments = block.querySelectorAll('a');
+  if (!fragments.length) return;
 
   const blockSection = block.closest('.section');
-  blockSection.classList.add(...fragmentSection.classList);
-  block.closest('.accordion-wrapper').replaceWith(...fragmentSection.childNodes);
-  fragmentSection.remove();
+  const accordionWrapper = block.closest('.accordion-wrapper');
+
+  const fragmentPromises = Array.from(fragments).map(async (fragment) => {
+    const path = fragment.getAttribute('href');
+    const content = await loadFragment(path);
+    const fragmentSection = content && content.querySelector('.section');
+
+    if (!fragmentSection) return null;
+
+    buildAccordionSection(fragmentSection);
+    fragmentSection.querySelectorAll('.accordion').forEach((accordion) => {
+      accordion.classList.add(...block.classList);
+      decorate(accordion);
+    });
+
+    return fragmentSection;
+  });
+
+  const fragmentSections = (await Promise.all(fragmentPromises)).filter(Boolean);
+
+  if (fragmentSections.length > 0) {
+    fragmentSections.forEach((fragmentSection, index) => {
+      blockSection.classList.add(...fragmentSection.classList);
+
+      if (index === 0 && accordionWrapper && accordionWrapper.parentNode) {
+        accordionWrapper.replaceWith(...fragmentSection.childNodes);
+      } else {
+        blockSection.append(...fragmentSection.childNodes);
+      }
+
+      fragmentSection.remove();
+    });
+  }
 }
 
 async function decorateFragmentBody(block) {
