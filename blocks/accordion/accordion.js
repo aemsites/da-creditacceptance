@@ -61,9 +61,11 @@ function rearrangeSectionContents(section) {
 
 function buildAccordionSection(section) {
   rearrangeSectionContents(section);
-
+  var defaultContentWrapper;
   const heading = section.querySelector('h1,h2');
-  const defaultContentWrapper = createTag('div', { class: 'default-content-wrapper' }, heading);
+  if (heading) {
+    defaultContentWrapper = createTag('div', { class: 'default-content-wrapper' }, heading);
+  }
   const accordion = createTag('div', { class: 'accordion faqs block', 'data-block-name': 'accordion' });
   const accordionWrapper = createTag('div', { class: 'accordion-wrapper' }, accordion);
 
@@ -85,7 +87,11 @@ function buildAccordionSection(section) {
   });
 
   section.innerHTML = '';
-  section.append(defaultContentWrapper, accordionWrapper);
+  if (defaultContentWrapper) {
+    section.append(defaultContentWrapper, accordionWrapper);
+  } else {
+    section.append(accordionWrapper);
+  }
 }
 
 async function decorateFAQs(block) {
