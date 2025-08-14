@@ -81,6 +81,13 @@ class PaletteElement extends LitElement {
     if (actions?.sendHTML) {
       actions.sendHTML(brandName);
     }
+    
+    // Copy brandName to clipboard
+    try {
+      await navigator.clipboard.writeText(brandName);
+    } catch (err) {
+      console.warn('Failed to copy to clipboard:', err);
+    }
   }
 
   async initPalette() {

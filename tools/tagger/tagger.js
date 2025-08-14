@@ -144,6 +144,13 @@ async function init() {
   const copyButton = selEl.querySelector('button.copy');
   copyButton.addEventListener('click', async () => {
     const copyText = document.getElementById('copybuffer');
+    // Copy copyText.value to clipboard
+    try {
+      await navigator.clipboard.writeText(copyText.value);
+    } catch (err) {
+      console.warn('Failed to copy to clipboard:', err);
+    }
+
     const { actions } = await DA_SDK;
     if (actions?.sendHTML) {
       actions.sendHTML(copyText.value);

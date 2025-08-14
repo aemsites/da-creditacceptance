@@ -51,6 +51,48 @@ async function fetchData() {
     }
   });
 
+  // sort by date
+  Object.keys(categoryMap).forEach((category) => {
+    categoryMap[category].sort((a, b) => {
+      const dateA = a.date ?? a.lastModified;
+      const dateB = b.date ?? b.lastModified;
+      
+      // Handle empty dates - put them at the end
+      if (!dateA && !dateB) return 0;
+      if (!dateA) return 1;
+      if (!dateB) return -1;
+      
+      // Parse dates properly
+      let parsedDateA, parsedDateB;
+      
+      // Handle Unix timestamps (numbers > 1000000000)
+      if (typeof dateA === 'number' && dateA > 1000000000) {
+        parsedDateA = new Date(dateA * 1000);
+      } else if (typeof dateA === 'number') {
+        // Excel date number (smaller numbers)
+        parsedDateA = new Date(Math.round((dateA - (1 + 25567 + 1)) * 86400 * 1000));
+      } else {
+        parsedDateA = new Date(dateA);
+      }
+      
+      if (typeof dateB === 'number' && dateB > 1000000000) {
+        parsedDateB = new Date(dateB * 1000);
+      } else if (typeof dateB === 'number') {
+        // Excel date number (smaller numbers)
+        parsedDateB = new Date(Math.round((dateB - (1 + 25567 + 1)) * 86400 * 1000));
+      } else {
+        parsedDateB = new Date(dateB);
+      }
+      
+      // Handle invalid dates
+      if (isNaN(parsedDateA.getTime()) && isNaN(parsedDateB.getTime())) return 0;
+      if (isNaN(parsedDateA.getTime())) return 1;
+      if (isNaN(parsedDateB.getTime())) return -1;
+      
+      return parsedDateB - parsedDateA;
+    });
+  });
+
   // remove empty categories
   Object.keys(categoryMap).forEach((category) => {
     if (categoryMap[category].length === 0) {

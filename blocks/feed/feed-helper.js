@@ -15,11 +15,22 @@ export function calculateExcelDate(date) {
 
 export function formatCardLocaleDate(date) {
   if (!date || !isDateValid(date)) return '';
-  const jsDate = !date.toString().includes('-') ? calculateExcelDate(date) : date.replace(/-/g, '/');
+  
+  let jsDate;
+  if (typeof date === 'number') {
+    // Excel date number
+    jsDate = calculateExcelDate(date);
+  } else if (date.toString().includes('-')) {
+    // Date string with dashes (e.g., "2025-07-08")
+    jsDate = new Date(date);
+  } else {
+    // Date string with slashes (e.g., "7/8/2025")
+    jsDate = new Date(date);
+  }
 
   const dateLocale = 'en-GB';
 
-  const dateString = new Date(jsDate).toLocaleDateString(dateLocale, {
+  const dateString = jsDate.toLocaleDateString(dateLocale, {
     day: '2-digit',
     month: 'short',
     year: '2-digit',
