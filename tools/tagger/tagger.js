@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 import { getTags } from '../../scripts/tags.js';
 

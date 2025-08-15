@@ -56,15 +56,15 @@ async function fetchData() {
     categoryMap[category].sort((a, b) => {
       const dateA = a.date ?? a.lastModified;
       const dateB = b.date ?? b.lastModified;
-      
       // Handle empty dates - put them at the end
       if (!dateA && !dateB) return 0;
       if (!dateA) return 1;
       if (!dateB) return -1;
-      
+
       // Parse dates properly
-      let parsedDateA, parsedDateB;
-      
+      let parsedDateA;
+      let parsedDateB;
+
       // Handle Unix timestamps (numbers > 1000000000)
       if (typeof dateA === 'number' && dateA > 1000000000) {
         parsedDateA = new Date(dateA * 1000);
@@ -74,7 +74,7 @@ async function fetchData() {
       } else {
         parsedDateA = new Date(dateA);
       }
-      
+
       if (typeof dateB === 'number' && dateB > 1000000000) {
         parsedDateB = new Date(dateB * 1000);
       } else if (typeof dateB === 'number') {
@@ -83,12 +83,12 @@ async function fetchData() {
       } else {
         parsedDateB = new Date(dateB);
       }
-      
+
       // Handle invalid dates
-      if (isNaN(parsedDateA.getTime()) && isNaN(parsedDateB.getTime())) return 0;
-      if (isNaN(parsedDateA.getTime())) return 1;
-      if (isNaN(parsedDateB.getTime())) return -1;
-      
+      if (Number.isNaN(parsedDateA.getTime()) && Number.isNaN(parsedDateB.getTime())) return 0;
+      if (Number.isNaN(parsedDateA.getTime())) return 1;
+      if (Number.isNaN(parsedDateB.getTime())) return -1;
+
       return parsedDateB - parsedDateA;
     });
   });

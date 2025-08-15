@@ -15,7 +15,6 @@ export function calculateExcelDate(date) {
 
 export function formatCardLocaleDate(date) {
   if (!date || !isDateValid(date)) return '';
-  
   let jsDate;
   if (typeof date === 'number') {
     // Excel date number

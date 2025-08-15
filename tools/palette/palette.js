@@ -1,4 +1,4 @@
-// import { createTag } from '../../../aemedge/scripts/utils.js';
+/* eslint-disable import/no-unresolved */
 import { LitElement, html, css } from 'https://da.live/deps/lit/lit-all.min.js';
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 import { getPalette } from '../../scripts/tags.js';
@@ -81,7 +81,7 @@ class PaletteElement extends LitElement {
     if (actions?.sendHTML) {
       actions.sendHTML(brandName);
     }
-    
+
     // Copy brandName to clipboard
     try {
       await navigator.clipboard.writeText(brandName);

@@ -61,7 +61,7 @@ function rearrangeSectionContents(section) {
 
 function buildAccordionSection(section) {
   rearrangeSectionContents(section);
-  var defaultContentWrapper;
+  let defaultContentWrapper;
   const heading = section.querySelector('h1,h2');
   if (heading) {
     defaultContentWrapper = createTag('div', { class: 'default-content-wrapper' }, heading);
