@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trust Widget</title>
+  <link rel="stylesheet" href="trust-widget.css">
+  <script type="module" src="trust-widget.js"></script>
+</head>
+<body>
+  <div class="trust-widget-container">
+    <div class="trust-widget-path" id="current-path">Loading path...</div>
+
+    <div class="trust-widget-code">
+      <label for="widgetHTMLCode">Trust Widget HTML Code <span class="required">*</span></label>
+      <textarea id="widgetHTMLCode" aria-label="Embed HTML Code" rows="18" required></textarea>
+    </div>
+
+    <div class="trust-widget-controls">
+      <button class="trust-widget-button primary" id="apply-button">Insert Trust Widget Block</button>
+    </div>
+
+    <div class="trust-widget-msg" id="trust-widget-msg">
+    </div>
+  </div>
+</body>
+</html>
