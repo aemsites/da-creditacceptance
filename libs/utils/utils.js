@@ -8,7 +8,7 @@ function fetchPalette() {
     palettePromise = new Promise((resolve, reject) => {
       (async () => {
         try {
-          const paletteJson = await ffetch('/tools/taxonomy.json').sheet('palette').all();
+          const paletteJson = await ffetch('/tools/library/color-tags.json').all();
           resolve(paletteJson);
         } catch (e) {
           reject(e);

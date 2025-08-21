@@ -1,7 +1,7 @@
 import ffetch from './ffetch.js';
 
 let taxonomyPromise;
-const taxonomyEndpoint = '/tools/taxonomy.json';
+const taxonomyEndpoint = '/tools/library/tags.json';
 
 function titleToName(name) {
   return name.toLowerCase().replace(' ', '-');
@@ -12,7 +12,7 @@ function fetchTaxonomy() {
     taxonomyPromise = new Promise((resolve, reject) => {
       (async () => {
         try {
-          const taxonomyJson = await ffetch(taxonomyEndpoint).sheet('tags').all();
+          const taxonomyJson = await ffetch(taxonomyEndpoint).all();
           const taxonomy = {};
           let curType;
           let l1;
