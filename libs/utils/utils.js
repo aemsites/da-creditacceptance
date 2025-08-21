@@ -27,12 +27,20 @@ export async function loadPalette() {
   const palette = await getPalette();
   if (!palette) return;
   palette.forEach((color) => {
-    window.CSS.registerProperty({
-      name: `--${color['brand-name']}`,
-      syntax: '<color> | <image>', // Any valid color or image(URL or a color gradient) value.
-      inherits: true,
-      initialValue: `${color['color-value']}`,
-    });
+    const propertyName = `--${color['brand-name']}`;
+    try {
+      window.CSS.registerProperty({
+        name: propertyName,
+        syntax: '<color> | <image>', // Any valid color or image(URL or a color gradient) value.
+        inherits: true,
+        initialValue: `${color['color-value']}`,
+      });
+    } catch (error) {
+      // Property already registered, skip silently
+      if (error.name !== 'InvalidModificationError') {
+        console.warn(`Failed to register CSS property ${propertyName}:`, error);
+      }
+    }
   });
   document.dispatchEvent(new CustomEvent('paletteLoaded', { detail: { palette } }));
 }
