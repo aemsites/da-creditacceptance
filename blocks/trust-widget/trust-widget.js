@@ -46,15 +46,6 @@ function initializeTrustpilotWidget(widgetContainer) {
         }
       }
     }, 100); // Check every 100ms
-
-    // Timeout in case Trustpilot doesn't load for some reason and not run into an infinite loop
-    // This is a safety measure to ensure that the script doesn't hang indefinitely
-    setTimeout(() => {
-      clearInterval(checkTrustpilotReady);
-      console.error('Trustpilot script took too long to load. Window.Trustpilot:', !!window.Trustpilot);
-      /* eslint-disable-next-line prefer-promise-reject-errors */
-      reject('Trustpilot script took too long to load');
-    }, 15000); // Increased timeout to 15 seconds
   });
 }
 
