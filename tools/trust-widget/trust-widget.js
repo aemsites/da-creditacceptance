@@ -1,181 +1,84 @@
-/**
- * Trust Widget Plugin for AEM Sidekick
- *
- * Allows users to inject Trust Pilot widgets (https://www.trustpilot.com)
- * originating as HTML code into documents
- */
-
 /* eslint-disable */
-import DA_SDK from 'https://da.live/nx/utils/sdk.js';
-// import { DA_ORIGIN } from 'https://da.live/nx/public/utils/constants.js';
-// import { createElement } from '/scripts/utils.js';
+import { readBlockConfig } from '../../scripts/aem.js';
 
-const TP_SCRIPT_SRC = 'https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js';
-/**
- * Constants for Trust Pilot widget plugin
- */
-// const CONSTANTS = {
-//   TRUSTPILOT: {
-//     HOST: 's3.tradingview.com',
-//     BASE_URL: 'https://s3.tradingview.com/external-embedding/',
-//     WIDGET_TYPE_PREFIX: 'embed-widget-',
-//     DEFAULT_CONFIG: {  // Default config
-//       "chartOnly": true,
-//       "width": "100%"
-//     },
-//     DEFAULT_HEIGHT: '500px'
-//   }
-// };
+// Function to initialize Trustpilot widget after script is loaded
+function initializeTrustpilotWidget(widgetContainer) {
+  return new Promise((resolve, reject) => {
+    const checkTrustpilotReady = setInterval(() => {
+      // Check if Trustpilot is ready and has the loadFromElement to load the widget
+      if (window.Trustpilot && window.Trustpilot.loadFromElement) {
+        clearInterval(checkTrustpilotReady); // Stop polling
+        try {
+          /* eslint-disable-next-line no-undef */
+          Trustpilot.loadFromElement(widgetContainer); // Initialize the widget from the element
+          resolve();
+        } catch (error) {
+          console.error('Error loading Trustpilot widget:', error);
+          reject(error);
+        }
+      }
+    }, 100); // Check every 100ms
 
-/**
- * Initializes the trust pilot plugin interface and sets up event handlers
- */
-(async function init() {
-  try {
-    // Import DA SDK components
-    const { context, token, actions } = await DA_SDK;
-    const { daFetch } = actions;
+    // Timeout in case Trustpilot doesn't load for some reason and not run into an infinite loop
+    // This is a safety measure to ensure that the script doesn't hang indefinitely
+    setTimeout(() => {
+      clearInterval(checkTrustpilotReady);
+      console.error('Trustpilot script took too long to load. Window.Trustpilot:', !!window.Trustpilot);
+      /* eslint-disable-next-line prefer-promise-reject-errors */
+      reject('Trustpilot script took too long to load');
+    }, 15000); // Increased timeout to 15 seconds
+  });
+}
 
-    // Set current document/page path
-    const pageInput = document.getElementById('current-path');
-    pageInput.textContent = context.path;
+async function injectTrustpilotWidget(block) {
+  const widgetContainer = document.createElement('div');
+  widgetContainer.classList.add('trustpilot-widget-container');
+  const config = readBlockConfig(block);
+  // Escape potentially unsafe characters in config.link
+  function escapeHTML(str) {
+    if (Array.isArray(str)) {
+      return str.map(s => escapeHTML(s)).join(", ");
+    }
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replace(/\//g, '&#x2F;');
+  }
+  const safeLink = escapeHTML(config.link);
+  const blockHTML = `<div>
+            <div>
+              <!-- TrustBox widget - Grid -->
+              <div class="trustpilot-widget" data-locale="${escapeHTML(config['data-locale'])}" data-template-id="${escapeHTML(config['data-template-id'])}" data-businessunit-id="${escapeHTML(config['data-businessunit-id'])}" data-style-height="${escapeHTML(config['data-style-height'])}" data-style-width="${escapeHTML(config['data-style-width'])}" data-stars="${escapeHTML(config['data-stars'])}" data-review-languages="${escapeHTML(config['data-review-languages'])}">
+              ${safeLink}
+              </div>
+              <!-- End TrustBox widget -->
+            </div>
+          </div>`;
+  widgetContainer.innerHTML = blockHTML;
+  block.innerHTML = '';
+  block.appendChild(widgetContainer);
 
-    // Get UI elements
-    const elements = {
-      container: document.querySelector('.trust-widget-container'),
-      applyBtn: document.getElementById('apply-button'),
-      pathDisplay: document.getElementById('current-path')
-    };
+  // The class name 'trustpilot-widget' is used to identify the widget container
+  // Jordan Confirmed that class name that will be used in the future for all Trustpilot widgets
+  const widgetElement = block.querySelector('.trustpilot-widget');
 
-    // Set up event listeners
-    setupEventListeners(elements, actions);
+  // Ensuring Trustpilot is fully initialized before trying to load the widget
+  await initializeTrustpilotWidget(widgetElement);
+}
 
+export default async function decorate(block) {
+  if (!block) return Promise.resolve();
+  
+  try {    
+    await injectTrustpilotWidget(block);
   } catch (error) {
-    handleError(error.message);
+    console.error('Failed to load Trustpilot widget:', error);
+    // Optionally show a fallback message
+    block.innerHTML = '<p>Unable to load reviews at this time. Please try again later.</p>';
   }
-}());
-
-/**
- * Sets up all event listeners
- * @param {Object} elements - UI elements
- * @param {Object} actions - SDK actions
- */
-function setupEventListeners(elements, actions) {
-  const { applyBtn } = elements;
-
-  if (applyBtn) {
-    applyBtn.addEventListener('click', () => {
-      insertBlock(actions);
-    });
-  }
-}
-
-/**
- * Generates Trust Pilot widget block markup to be injected into document
- * @param {string} scriptSrc - The widget script source
- * @param {Object} config - The widget configuration
- * @returns {string} HTML table string
- */
-function generateConfigTable(scriptSrc, config) {
-  return `
-    <table style="min-width: 221px;">
-      <colgroup><col style="width: 196px;"><col></colgroup>
-      <tbody>
-        <tr><td colspan="2" data-colwidth="196,0"><p>Trust Widget</p></td></tr>
-        <tr><td data-colwidth="196"><p>script</p></td><td><p>${scriptSrc}</p></td></tr>
-        ${ Object.entries(config).map(([key, value]) => `
-          <tr><td data-colwidth="196"><p>${key}</p></td><td><p>${value}</p></td></tr>
-        `).join('')}
-      </tbody>
-    </table>`;
-}
-
-/**
- * Parses Trust Pilot widget HTML code from textarea
- * @returns {Object} Object containing script source and config
- */
-function parseUserProvidedWidgetHTML() {
-  // Parse the user provided widget HTML code into a DOM object
-  const textarea = document.getElementById('widgetHTMLCode');
-  const widgetHTMLCode = textarea.value;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(widgetHTMLCode, 'text/html');
-
-  // Extract and parse the HTML and create a config object
-  /**
-   * <!-- TrustBox widget - Grid -->
-   * <div class="trustpilot-widget" data-locale="en-US" data-template-id="539adbd6dec7e10e686debee" data-businessunit-id="57e022220000ff000594ea87" data-style-height="500px" data-style-width="100%" data-stars="4,5" data-review-languages="en">
-   * <a href="https://www.trustpilot.com/review/creditacceptance.com" target="_blank" rel="noopener">Trustpilot</a>
-   * </div>
-   * <!-- End TrustBox widget -->
-   */
-  const trustpilotWidget = doc.querySelector('.trustpilot-widget');
-  const trustpilotLink = doc.querySelector('.trustpilot-widget a');
-  console.log('trustpilotLink:', trustpilotLink);
-  if (trustpilotWidget && trustpilotLink) {
-    // Extract all data attributes from the widget div
-    const dataAttributes = {};
-    const attributes = trustpilotWidget.attributes;
-    
-    for (let i = 0; i < attributes.length; i++) {
-      const attr = attributes[i];
-      if (attr.name.startsWith('data-')) {
-        dataAttributes[attr.name] = attr.value;
-      }
-    }
-    
-    const config = {
-      "scriptSrc": TP_SCRIPT_SRC,
-      "config": {
-        ...dataAttributes,
-        "link": trustpilotLink.outerHTML,
-      }
-    };
-    
-    return config;
-  } else {
-    handleError('No Trust Pilot widget found in the HTML code.');
-    return null;
-  }
-}
-
-function insertBlock(actions) {
-  console.log('insertBlock');
-  // Parse the widget HTML and extract configuration
-  const widgetConfig = parseUserProvidedWidgetHTML();
-  if (!widgetConfig) { // If no widget config is found, return
-    console.log('No widget config found');
-    return;
-  }
-
-  // Inject the Trust Pilot widget into the document
-  try {
-    if (actions && actions.sendHTML) {
-      const { scriptSrc: injectedBlockScriptSrc, config: injectedBlockConfig } = widgetConfig;
-      const configHTML = generateConfigTable(injectedBlockScriptSrc, injectedBlockConfig);
-      console.log('configHTML:', configHTML);
-      actions.sendHTML(configHTML);
-      actions.closeLibrary();
-    } else {
-      handleError('Cannot inject Trust Widget : Document editor actions not available');
-    }
-  } catch (err) {
-    handleError('Failed to inject Trust Widget into document: ' + err.message);
-  }
-}
-
-/**
- * Handles initialization error
- * @param {Error} error - Error object
- */
-function handleError(error) {
-  console.error('Error:', error);
-  const container = document.getElementById('trust-widget-msg');
-  if (container) {
-    container.innerHTML = `
-      <div class="trust-widget-error">
-        <p>${error}</p>
-      </div>
-    `;
-  }
+  
+  return Promise.resolve();
 }
