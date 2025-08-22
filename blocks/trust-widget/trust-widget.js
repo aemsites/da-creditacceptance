@@ -31,22 +31,13 @@ export function useTrustpilotWidget(block, callback) {
 
 // Function to initialize Trustpilot widget after script is loaded
 function initializeTrustpilotWidget(widgetContainer) {
-  return new Promise((resolve, reject) => {
-    const checkTrustpilotReady = setInterval(() => {
-      // Check if Trustpilot is ready and has the loadFromElement to load the widget
-      if (window.Trustpilot && window.Trustpilot.loadFromElement) {
-        clearInterval(checkTrustpilotReady); // Stop polling
-        try {
-          /* eslint-disable-next-line no-undef */
-          Trustpilot.loadFromElement(widgetContainer); // Initialize the widget from the element
-          resolve();
-        } catch (error) {
-          console.error('Error loading Trustpilot widget:', error);
-          reject(error);
-        }
-      }
-    }, 100); // Check every 100ms
-  });
+  try {
+    /* eslint-disable-next-line no-undef */
+    Trustpilot.loadFromElement(widgetContainer); // Initialize the widget from the element
+  } catch (error) {
+    console.error('Error loading Trustpilot widget:', error);
+    throw error;
+  }
 }
 
 async function injectTrustpilotWidget(block) {
@@ -85,7 +76,7 @@ async function injectTrustpilotWidget(block) {
   const widgetElement = block.querySelector('.trustpilot-widget');
 
   // Ensuring Trustpilot is fully initialized before trying to load the widget
-  await initializeTrustpilotWidget(widgetElement);
+  initializeTrustpilotWidget(widgetElement);
 }
 
 export default async function decorate(block) {
