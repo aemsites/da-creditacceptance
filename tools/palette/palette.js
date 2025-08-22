@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import { LitElement, html, css } from 'https://da.live/deps/lit/lit-all.min.js';
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
-import { getPalette } from '../../scripts/tags.js';
+import { getPalette } from '../../libs/utils/utils.js';
 
 class PaletteElement extends LitElement {
   static properties = {

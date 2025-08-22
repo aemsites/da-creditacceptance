@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-unresolved
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
-import { getTags } from '../../scripts/tags.js';
+import { getTaxonomy } from '../../scripts/taxonomy.js';
 
 let selectedOrder = [];
 
@@ -138,7 +138,7 @@ function displaySelected() {
 }
 
 async function init() {
-  const tags = await getTags();
+  const tags = await getTaxonomy();
   initTaxonomy(tags);
 
   const selEl = document.getElementById('selected');
